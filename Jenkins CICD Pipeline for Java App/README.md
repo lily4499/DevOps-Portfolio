@@ -202,22 +202,24 @@ loan-calculator-java/
 ```bash
 # Launch EC2 instance
 aws ec2 run-instances \
-  --image-id ami-0abcdef1234567890 \
+  --image-id ami-0953476d60561c955 \
   --instance-type t2.micro \
-  --key-name my-key \
-  --security-groups my-sg
+  --key-name ec2-devops-key \
+  --security-groups aws-lil-sg
+![image](https://github.com/user-attachments/assets/a1f0730b-dfa2-4335-92ca-09a146088baa)
 
 # Connect to EC2
-ssh -i my-key.pem ec2-user@<ec2-public-ip>
+ssh -i /home/lilia/ec2.pem ec2-user@<ec2-public-ip>
 
 # Install Tomcat
 sudo yum install java -y
-wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.85/bin/apache-tomcat-9.0.85.tar.gz
+wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.85/bin/apache-tomcat-9.0.85.tar.gz
 tar -xvf apache-tomcat-9.0.85.tar.gz
 sudo mv apache-tomcat-9.0.85 /opt/tomcat
 chmod +x /opt/tomcat/bin/*.sh
 /opt/tomcat/bin/startup.sh
 ```
+![image](https://github.com/user-attachments/assets/641a716c-4db0-47bb-9de6-3ba59c29f562)
 
 ✅ **Ensure port 8080 is open in the EC2 security group.**
 
@@ -235,8 +237,10 @@ docker run -d \
 ```
 
 > Or install Jenkins directly on a server or VM.
+![image](https://github.com/user-attachments/assets/1b03e32f-6be8-41c3-870a-ce03c5ce9296)
 
 ---
+
 
 ###  Step 3: Install Jenkins Plugins
 
@@ -257,16 +261,68 @@ Install the following plugins via **Manage Jenkins → Plugin Manager**:
 
 ```bash
 ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa_jenkins
+cat ~/.ssh/id_rsa.pub
+echo "paste-your-id_rsa.pub-content-here" >> ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+ssh ec2-user@54.162.92.114
+
+![image](https://github.com/user-attachments/assets/f2aed8fb-339d-440b-a923-5d8a1112f4d6)
+
+
+
 ssh-copy-id -i ~/.ssh/id_rsa_jenkins.pub ec2-user@<ec2-public-ip>
 ```
 
 * In **Publish over SSH Plugin**, configure:
-
+Go to Manage Jenkins → Configure System
+Scroll to Publish over SSH section
+Click Add under "SSH Servers"
   * **Name**: `tomcat-ec2`
   * **Hostname**: `EC2 IP`
   * **Username**: `ec2-user`
-  * **Key**: `~/.ssh/id_rsa_jenkins`
+  * **Key**: `Paste the full private key in the "Key" field.`
   * **Remote Dir**: `/opt/tomcat/webapps`
+  * Click "Test Configuration"
+
+![image](https://github.com/user-attachments/assets/e6c52432-11d5-4529-91f6-06d19d823fd1)
+
+---
+### Maven is expecting a web.xml deployment descriptor because you are building a traditional WAR file 
+mkdir -p src/main/webapp/WEB-INF
+vim src/main/webapp/WEB-INF/web.xml
+```xml
+<web-app xmlns="http://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://jakarta.ee/xml/ns/jakartaee 
+                             http://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <display-name>Loan Calculator App</display-name>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>
+```
+### To make http://localhost:8080/loan-calculator/ display content, you must include at least one of:
+Add an HTML or JSP page
+mkdir -p  src/main/webapp
+vim src/main/webapp/index.jsp
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Loan Calculator</title>
+</head>
+<body>
+    <h1>Welcome to the Loan Calculator App</h1>
+    <p>This app calculates total repayment based on your inputs.</p>
+</body>
+</html>
+
+
+```
 
 ---
 
@@ -324,14 +380,14 @@ pipeline {
 
         stage('Notify via Slack') {
             steps {
-                slackSend(channel: '#ci-cd', message: "Build & deployment of ${APP_NAME} completed ✅", color: '#36a64f')
+                slackSend(channel: '#devops-project', message: "Build & deployment of ${APP_NAME} completed ✅", color: '#36a64f')
             }
         }
     }
 
     post {
         failure {
-            slackSend(channel: '#ci-cd', message: "Build failed for ${APP_NAME} ❌", color: '#FF0000')
+            slackSend(channel: '#devops-project', message: "Build failed for ${APP_NAME} ❌", color: '#FF0000')
         }
     }
 }
@@ -360,6 +416,11 @@ Push code to GitHub → Jenkins will:
 * Deploy WAR to EC2’s Tomcat
 * Notify team via Slack
 
+![image](https://github.com/user-attachments/assets/9026428a-16a0-4c61-ab11-2806e2f51cf7)
+
+![image](https://github.com/user-attachments/assets/8b4f600e-c245-4637-9330-70aee76deb7a)
+
+
 ---
 
 ## 📤 Slack Notification Setup
@@ -374,7 +435,7 @@ Push code to GitHub → Jenkins will:
 Then call:
 
 ```groovy
-slackSend(channel: '#ci-cd', message: "Deployment successful ✅")
+slackSend(channel: '#devops-project', message: "Deployment successful ✅")
 ```
 
 ---
