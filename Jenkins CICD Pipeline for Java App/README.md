@@ -305,7 +305,7 @@ vim src/main/webapp/WEB-INF/web.xml
     </welcome-file-list>
 </web-app>
 ```
-### To make http://localhost:8080/loan-calculator/ display content, you must include at least one of:
+### To make http://YOUR_EC2_PUBLIC_IP:8080/loan-calculator/ display content, you must include at least one of:
 Add an HTML or JSP page
 mkdir -p  src/main/webapp
 vim src/main/webapp/index.jsp
