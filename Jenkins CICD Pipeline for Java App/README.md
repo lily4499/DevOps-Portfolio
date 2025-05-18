@@ -23,6 +23,150 @@ You are a DevOps Engineer at a fintech company. The dev team pushes code to a Gi
 * **Slack/Email** – Notifications
 
 ---
+## create_project.py
+
+```
+import os
+
+# Define base directory
+base_dir = '/home/lilia/VIDEOS/loan-calculator-java'
+
+# Define file structure and contents
+file_structure = {
+    "src/main/java/com/example/LoanCalculator/LoanController.java": """
+package com.example.LoanCalculator;
+
+public class LoanController {
+    public String calculateLoan(double amount, double rate, int years) {
+        double interest = amount * rate * years / 100;
+        return "Total repayment: $" + (amount + interest);
+    }
+
+    public static void main(String[] args) {
+        LoanController controller = new LoanController();
+        System.out.println(controller.calculateLoan(10000, 5, 2));
+    }
+}
+""",
+    "test/java/com/example/LoanCalculator/LoanControllerTest.java": """
+package com.example.LoanCalculator;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class LoanControllerTest {
+    @Test
+    public void testCalculateLoan() {
+        LoanController controller = new LoanController();
+        String result = controller.calculateLoan(10000, 5, 2);
+        assertEquals("Total repayment: $11000.0", result);
+    }
+}
+""",
+    "pom.xml": """
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>loan-calculator</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>loan-calculator</finalName>
+    </build>
+</project>
+""",
+    "Jenkinsfile": """
+pipeline {
+    agent any
+
+    environment {
+        EC2_IP = "YOUR_EC2_PUBLIC_IP"
+        APP_NAME = "loanapp"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/youruser/loan-calculator-java.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Deploy to Tomcat on EC2') {
+            steps {
+                sshPublisher(
+                    publishers: [
+                        sshPublisherDesc(
+                            configName: 'tomcat-ec2',
+                            transfers: [
+                                sshTransfer(
+                                    sourceFiles: '**/target/*.war',
+                                    remoteDirectory: '/opt/tomcat/webapps/',
+                                    removePrefix: 'target',
+                                    execCommand: '/opt/tomcat/bin/shutdown.sh; sleep 5; /opt/tomcat/bin/startup.sh'
+                                )
+                            ],
+                            usePromotionTimestamp: false,
+                            verbose: true
+                        )
+                    ]
+                )
+            }
+        }
+
+        stage('Notify via Slack') {
+            steps {
+                slackSend(channel: '#ci-cd', message: "Build & deployment of ${APP_NAME} completed ✅", color: '#36a64f')
+            }
+        }
+    }
+
+    post {
+        failure {
+            slackSend(channel: '#ci-cd', message: "Build failed for ${APP_NAME} ❌", color: '#FF0000')
+        }
+    }
+}
+"""
+}
+
+# Create directories and files
+for relative_path, content in file_structure.items():
+    file_path = os.path.join(base_dir, relative_path)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w') as f:
+        f.write(content.strip())
+
+"Files created successfully at /home/lilia/VIDEOS/loan-calculator-java"
+
+
+```
+
+---
 
 ## 📁 Project Structure
 
