@@ -1,4 +1,4 @@
-# 🚀 Liliane Konissi – DevOps Engineer Portfolio
+# Liliane Konissi – DevOps Engineer Portfolio
 
 Welcome to my DevOps portfolio! I'm a results-driven DevOps Engineer with 3+ years of experience in automating infrastructure, optimizing CI/CD pipelines, and deploying scalable cloud-native applications. I specialize in AWS, Jenkins, Terraform, Linux administration, and Java app deployment.
 
