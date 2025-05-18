@@ -163,8 +163,18 @@ for relative_path, content in file_structure.items():
 
 "Files created successfully at /home/lilia/VIDEOS/loan-calculator-java"
 
+```
+
+---
+Save the script as create_project.py
+Run it with sudo:
+```bash
+sudo python3 create_project.py
 
 ```
+---
+
+
 
 ---
 
