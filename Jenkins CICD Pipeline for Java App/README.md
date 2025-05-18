@@ -206,6 +206,7 @@ aws ec2 run-instances \
   --instance-type t2.micro \
   --key-name ec2-devops-key \
   --security-groups aws-lil-sg
+```
 ![image](https://github.com/user-attachments/assets/a1f0730b-dfa2-4335-92ca-09a146088baa)
 
 # Connect to EC2
@@ -407,6 +408,8 @@ pipeline {
 ---
 
 ###  Step 7: Trigger the Pipeline
+
+git rm -r --cached target/
 
 Push code to GitHub → Jenkins will:
 
