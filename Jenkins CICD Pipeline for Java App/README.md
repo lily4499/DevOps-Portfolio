@@ -238,5 +238,5 @@ slackSend(channel: '#ci-cd', message: "Deployment successful ✅")
 
 ---
 
-Would you like me to include a sample `pom.xml` file next?
+
 
