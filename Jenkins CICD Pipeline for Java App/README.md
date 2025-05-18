@@ -1,7 +1,7 @@
 
 #  Automated CI/CD Pipeline for Java Web App using Jenkins
 ---
-> At FinEdge Solutions, a fast-growing fintech startup, the development team needed a reliable and automated way to build and deploy their Java-based Loan Calculator application. Manual deployments to their Tomcat server on AWS EC2 were time-consuming and error-prone, causing delays in feature releases. As the DevOps engineer, I implemented a Jenkins-driven CI/CD pipeline that automated the entire lifecycle — from pulling code from GitHub, running unit tests with Maven, packaging the application as a WAR file, and securely deploying it to EC2. I also integrated Slack notifications to keep the team informed of each build’s status in real-time. This automation not only reduced deployment time by 80% but also improved release reliability, helping the company accelerate delivery of financial tools to customers.
+> At a fast-growing fintech startup, the development team needed a reliable and automated way to build and deploy their Java-based Loan Calculator application. Manual deployments to their Tomcat server on AWS EC2 were time-consuming and error-prone, causing delays in feature releases. As the DevOps engineer, I implemented a Jenkins-driven CI/CD pipeline that automated the entire lifecycle — from pulling code from GitHub, running unit tests with Maven, packaging the application as a WAR file, and securely deploying it to EC2. I also integrated Slack notifications to keep the team informed of each build’s status in real-time. This automation not only reduced deployment time by 80% but also improved release reliability, helping the company accelerate delivery of financial tools to customers.
 
 
 
